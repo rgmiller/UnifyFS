@@ -24,6 +24,9 @@
 #include "na_config.h" // from mercury include lib
 #include "mercury_log.h"
 
+// Macros for logging timing messages (for deubg)
+#include "timing_macros.h"
+
 // global variables
 ServerRpcContext_t* unifyfsd_rpc_context;
 bool margo_use_tcp = true;
@@ -359,6 +362,7 @@ static void register_client_server_rpcs(margo_instance_id mid)
  */
 int margo_server_rpc_init(void)
 {
+    TIMING_TOP();
     int rc = UNIFYFS_SUCCESS;
 
     if (NULL == unifyfsd_rpc_context) {
@@ -413,6 +417,7 @@ int margo_server_rpc_init(void)
         register_server_server_rpcs(mid);
     }
 
+    TIMING_BOT();
     return rc;
 }
 
