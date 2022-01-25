@@ -18,6 +18,7 @@
 #include "unifyfs_misc.h"
 
 //#include "config.h"
+#include "timing_macros.h"
 
 #if defined(USE_PMIX)
 # include <pmix.h>
@@ -346,6 +347,8 @@ static pmix_proc_t pmix_myproc;
 // initialize PMIx
 int unifyfs_pmix_init(void)
 {
+    TIMING_TOP();
+
     int rc;
     size_t pmix_univ_nprocs;
     pmix_value_t value;
@@ -394,12 +397,15 @@ int unifyfs_pmix_init(void)
 
     pmix_initialized = 1;
 
+    TIMING_BOT();
     return (int)UNIFYFS_SUCCESS;
 }
 
 // finalize PMIx
 static int unifyfs_pmix_fini(void)
 {
+    TIMING_TOP();
+
     int rc;
     size_t ninfo;
     pmix_info_t* info;
@@ -429,12 +435,16 @@ static int unifyfs_pmix_fini(void)
         pmix_initialized = 0;
         rc = (int) UNIFYFS_SUCCESS;
     }
+
+    TIMING_BOT();
+    
     return rc;
 }
 
 static int unifyfs_pmix_lookup(const char* key,
                                char** oval)
 {
+    TIMING_TOP();
     int rc, wait;
     size_t ndir;
     pmix_data_range_t range;
@@ -480,6 +490,8 @@ static int unifyfs_pmix_lookup(const char* key,
     /* cleanup */
     PMIX_PDATA_FREE(pdata, 1);
     PMIX_INFO_FREE(directives, ndir);
+
+    TIMING_BOT();
     return rc;
 }
 
@@ -487,6 +499,8 @@ static int unifyfs_pmix_lookup(const char* key,
 static int unifyfs_pmix_publish(const char* key,
                                 const char* val)
 {
+    TIMING_TOP();
+
     int rc;
     size_t ninfo;
     pmix_info_t* info;
@@ -516,12 +530,15 @@ static int unifyfs_pmix_publish(const char* key,
     }
     /* cleanup */
     PMIX_INFO_FREE(info, ninfo);
+
+    TIMING_BOT();
     return rc;
 }
 
 static int unifyfs_pmix_fence(void)
 {
     // PMIx_Fence is a collective barrier across all processes in my namespace
+    TIMING_TOP();
     int rc = PMIx_Fence(NULL, 0, NULL, 0);
     if (rc != PMIX_SUCCESS) {
         LOGERR("PMIx rank %d: PMIx_Fence failed: %s",
@@ -530,6 +547,7 @@ static int unifyfs_pmix_fence(void)
     } else {
         rc = (int)UNIFYFS_SUCCESS;
     }
+    TIMING_BOT();
     return rc;
 }
 
@@ -873,6 +891,8 @@ int unifyfs_keyval_init(unifyfs_cfg_t* cfg,
                         int* rank,
                         int* nranks)
 {
+    TIMING_TOP();
+
     int rc;
 
     if (!kv_initialized) {
@@ -914,6 +934,7 @@ int unifyfs_keyval_init(unifyfs_cfg_t* cfg,
         *nranks = kv_nranks;
     }
 
+    TIMING_BOT();
     return (int)UNIFYFS_SUCCESS;
 }
 
